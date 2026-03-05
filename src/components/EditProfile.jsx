@@ -48,18 +48,19 @@ const EditProfile = ({ user }) => {
     setPhotoPreview(objectUrl);
   };
 
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      };
-      fileReader.onerror = (error) => {
-        console.error("Base64 conversion failed", error);
-        reject(error);
-      };
-    });
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "tinder");
+
+    const res = await fetch(
+      "https://api.cloudinary.com/v1_1/df2xt5vbu/image/upload",
+      { method: "POST", body: formData }
+    );
+
+    if (!res.ok) throw new Error("Cloudinary upload failed");
+    const data = await res.json();
+    return data.secure_url;
   };
 
   const handleSubmit = async (e) => {
@@ -74,16 +75,19 @@ const EditProfile = ({ user }) => {
     try {
       let finalPhotoUrl = photoUrl;
 
-      // Handle file upload if a file was selected
+      // Upload to Cloudinary if a new file was selected
       if (photoFile) {
         try {
-          finalPhotoUrl = await convertToBase64(photoFile);
+          toast.info("Uploading image...", { autoClose: false, toastId: "upload" });
+          finalPhotoUrl = await uploadToCloudinary(photoFile);
+          toast.dismiss("upload");
         } catch (error) {
-          toast.error("Failed to process image file");
+          toast.dismiss("upload");
+          toast.error("Failed to upload image. Please try again.");
           setLoading(false);
           return;
         }
-        // Clean up object URL to prevent memory leaks
+        // Clean up local preview URL
         if (photoPreview) URL.revokeObjectURL(photoPreview);
       }
 
