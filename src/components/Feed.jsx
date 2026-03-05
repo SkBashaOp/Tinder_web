@@ -38,10 +38,6 @@ const Feed = () => {
     if (!feed) {
       getFeed();
     }
-    // Refetch when feed runs out (all cards swiped)
-    else if (feed.length === 0) {
-      getFeed();
-    }
   }, []);
 
   return (
