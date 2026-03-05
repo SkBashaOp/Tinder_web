@@ -16,7 +16,10 @@ const DraggableCard = ({ profile, handlePendingRequest }) => {
   const nopeOpacity = useTransform(x, [-150, -50, 0], [1, 0, 0]);
   const likeOpacity = useTransform(x, [0, 50, 150], [0, 0, 1]);
 
+  const isPreview = profile._id === "preview";
+
   const handleDragEnd = (event, info) => {
+    if (isPreview) return;
     if (info.offset.x > 100) {
       setExitX(300);
       handlePendingRequest("interested", profile._id);
@@ -27,6 +30,7 @@ const DraggableCard = ({ profile, handlePendingRequest }) => {
   };
 
   const manualSwipe = (dir) => {
+    if (isPreview) return;
     if (dir === "right") {
       setExitX(300);
       handlePendingRequest("interested", profile._id);
@@ -41,9 +45,9 @@ const DraggableCard = ({ profile, handlePendingRequest }) => {
   return (
     <>
       <motion.div
-        className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+        className={`absolute inset-0 w-full h-full ${isPreview ? "cursor-default" : "cursor-grab active:cursor-grabbing"}`}
         style={{ x, scale, rotate }}
-        drag="x"
+        drag={isPreview ? false : "x"}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.8}
         onDragEnd={handleDragEnd}
@@ -137,20 +141,32 @@ const UserCard = ({ feed }) => {
   const dispatch = useDispatch();
 
   const handlePendingRequest = async (status, id) => {
+    const safeId = String(id).trim();
+
+    // Optimistic update: remove card immediately so next card shows without waiting for API
+    setTimeout(() => {
+      dispatch(removeUserFromFeed(safeId));
+    }, 300);
+
     try {
       await axios.post(
-        `/api/request/send/${status}/${id}`,
+        `/api/request/send/${status}/${safeId}`,
         {},
         { withCredentials: true }
       );
-
-      setTimeout(() => {
-        dispatch(removeUserFromFeed(id));
-      }, 300);
-
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Action failed");
-      console.error(error);
+      const statusCode = error?.response?.status;
+      const responseData = error?.response?.data;
+      const message =
+        responseData?.message ||
+        (typeof responseData === "string" && !responseData.trim().startsWith("<") ? responseData : null) ||
+        "Action failed";
+
+      // Don't show toast for 400 since we already removed the card (expected for duplicates)
+      if (statusCode !== 400) {
+        toast.error(message);
+        console.error(error);
+      }
     }
   };
 

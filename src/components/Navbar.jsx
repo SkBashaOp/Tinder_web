@@ -91,7 +91,7 @@ const Navbar = () => {
 
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="relative rounded-full border-2 border-transparent hover:border-pink-500 transition-all focus:outline-none"
+              className="relative rounded-full border-2 border-transparent dark:border-white/20 hover:border-pink-500 dark:hover:border-pink-500 transition-all focus:outline-none ring-2 ring-transparent dark:ring-white/10"
             >
               <img
                 alt="Avatar"
