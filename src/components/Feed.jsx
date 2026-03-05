@@ -34,8 +34,15 @@ const Feed = () => {
   };
 
   useEffect(() => {
-    getFeed();
-  }, []);
+    // Initial fetch if feed is null
+    if (!feed) {
+      getFeed();
+    }
+    // Refetch when feed runs out (all cards swiped)
+    else if (feed.length === 0) {
+      getFeed();
+    }
+  }, [feed]);
 
   return (
     <div className="min-h-screen pt-32 pb-24 px-4 bg-[#fafafa] dark:bg-zinc-950 flex flex-col items-center overflow-hidden">
