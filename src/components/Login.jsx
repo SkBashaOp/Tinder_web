@@ -52,6 +52,8 @@ const Login = () => {
       let errorMessage;
       if (!error.response || error.code === "ERR_NETWORK") {
         errorMessage = "Unable to connect to the server. Please try again later.";
+      } else if (status === 500) {
+        errorMessage = "500 Internal Server Error — The server encountered an issue. Please try again later.";
       } else if (status === 502 || status === 503 || status === 504) {
         errorMessage = "Server is currently unavailable. Please try again later.";
       } else if (typeof responseData === "string" && responseData.trim().startsWith("<")) {
