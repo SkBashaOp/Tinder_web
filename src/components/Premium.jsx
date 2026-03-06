@@ -1,13 +1,58 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, Star, Crown, Zap } from "lucide-react";
 
 const Premium = () => {
-    const handleBuyClick = async (type) => {
-        console.log("Hello Premium user", type);
+    const [isUserPremium, setIsUserPremium] = useState(false);
+    useEffect(() => {
+        verifyPremiumUser();
+    }, []);
+
+    const verifyPremiumUser = async () => {
+        const res = await axios.get("/premium/verify", {
+            withCredentials: true,
+        });
+
+        if (res.data.isPremium) {
+            setIsUserPremium(true);
+        }
     };
 
-    return (
+    const handleBuyClick = async (type) => {
+        const order = await axios.post(
+            "/payment/create",
+            {
+                membershipType: type,
+            },
+            { withCredentials: true }
+        );
+
+        const { amount, keyId, currency, notes, orderId } = order.data;
+
+        const options = {
+            key: keyId,
+            amount,
+            currency,
+            name: "Dev Tinder",
+            description: "Connect to other developers",
+            order_id: orderId,
+            prefill: {
+                name: notes.firstName + " " + notes.lastName,
+                email: notes.emailId,
+                contact: "9999999999",
+            },
+            theme: {
+                color: "#F37254",
+            },
+            handler: verifyPremiumUser,
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+    };
+
+    return isUserPremium ? (
+        "You're are already a premium user") : (
         <div className="min-h-[80vh] py-24 mb-10 px-4 flex flex-col items-center justify-center bg-transparent">
             <div className="text-center mb-16">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 pb-2 leading-tight bg-gradient-to-r from-pink-500 to-orange-400 text-transparent bg-clip-text inline-block">
