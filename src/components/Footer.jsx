@@ -1,5 +1,6 @@
 import React from "react";
 import { Flame, Heart, Twitter, Github, Linkedin } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -17,6 +18,11 @@ const Footer = () => {
           <p className="text-sm text-muted-foreground max-w-sm text-center md:text-left">
             Connect with developers who share your passion for clean code and great products.
           </p>
+          <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-muted-foreground pt-1">
+            <Link to="/privacy-policy" className="hover:text-pink-500 transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-pink-500 transition-colors">Terms of Service</Link>
+            <Link to="/refund-policy" className="hover:text-pink-500 transition-colors">Refund Policy</Link>
+          </div>
         </div>
 
         <div className="flex flex-col items-center md:items-end space-y-6">

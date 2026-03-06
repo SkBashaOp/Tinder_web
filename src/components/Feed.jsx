@@ -20,14 +20,23 @@ const CardSkeleton = () => (
 const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const dispatch = useDispatch();
+  const [page, setPage] = React.useState(1);
+  const [hasMore, setHasMore] = React.useState(true);
 
-  const getFeed = async () => {
+  const getFeed = async (pageNumber) => {
+    if (!hasMore) return;
     try {
       const res = await axios.get(
-        "/api/user/feed",
+        `/api/user/feed?page=${pageNumber}&limit=10`,
         { withCredentials: true }
       );
-      dispatch(addFeed(res?.data?.data));
+
+      const newUsers = res?.data?.data || [];
+      if (newUsers.length === 0) {
+        setHasMore(false);
+      }
+
+      dispatch(addFeed(newUsers));
     } catch (error) {
       console.error("Failed to load feed", error);
     }
@@ -36,9 +45,15 @@ const Feed = () => {
   useEffect(() => {
     // Initial fetch if feed is null
     if (!feed) {
-      getFeed();
+      getFeed(1);
     }
-  }, []);
+    // Refetch next page when feed runs out (all cards swiped)
+    else if (feed.length === 0 && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      getFeed(nextPage);
+    }
+  }, [feed]);
 
   return (
     <div className="min-h-screen pt-32 pb-24 px-4 bg-[#fafafa] dark:bg-zinc-950 flex flex-col items-center overflow-hidden">

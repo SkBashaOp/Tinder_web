@@ -16,21 +16,25 @@ const DraggableCard = ({ profile, handlePendingRequest }) => {
   const nopeOpacity = useTransform(x, [-150, -50, 0], [1, 0, 0]);
   const likeOpacity = useTransform(x, [0, 50, 150], [0, 0, 1]);
 
+  const [isProcessing, setIsProcessing] = useState(false);
   const isPreview = profile._id === "preview";
 
   const handleDragEnd = (event, info) => {
-    if (isPreview) return;
+    if (isPreview || isProcessing) return;
     if (info.offset.x > 100) {
+      setIsProcessing(true);
       setExitX(300);
       handlePendingRequest("interested", profile._id);
     } else if (info.offset.x < -100) {
+      setIsProcessing(true);
       setExitX(-300);
       handlePendingRequest("ignored", profile._id);
     }
   };
 
   const manualSwipe = (dir) => {
-    if (isPreview) return;
+    if (isPreview || isProcessing) return;
+    setIsProcessing(true);
     if (dir === "right") {
       setExitX(300);
       handlePendingRequest("interested", profile._id);
