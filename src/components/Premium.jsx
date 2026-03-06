@@ -4,55 +4,115 @@ import { Check, Star, Crown, Zap } from "lucide-react";
 
 const Premium = () => {
     const [isUserPremium, setIsUserPremium] = useState(false);
+
     useEffect(() => {
-        verifyPremiumUser();
+        checkPremiumStatus();
     }, []);
 
-    const verifyPremiumUser = async () => {
-        const res = await axios.get("/api/premium/verify", {
-            withCredentials: true,
-        });
+    const checkPremiumStatus = async () => {
+        try {
+            const res = await axios.get("/api/premium/verify", {
+                withCredentials: true,
+            });
+            if (res.data.isPremium) {
+                setIsUserPremium(true);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-        if (res.data.isPremium) {
-            setIsUserPremium(true);
+    const verifyPremiumPayment = async (response) => {
+        try {
+            const res = await axios.post(
+                "/api/payment/verify",
+                {
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_signature: response.razorpay_signature,
+                },
+                { withCredentials: true }
+            );
+
+            if (res.data?.msg === "Payment verified successfully") {
+                setIsUserPremium(true);
+                // Trigger fallback status check
+                checkPremiumStatus();
+            }
+        } catch (err) {
+            console.error("Payment verification failed", err);
         }
     };
 
     const handleBuyClick = async (type) => {
-        const order = await axios.post(
-            "/api/payment/create",
-            {
-                membershipType: type,
-            },
-            { withCredentials: true }
-        );
+        try {
+            const order = await axios.post(
+                "/api/payment/create",
+                {
+                    membershipType: type,
+                },
+                { withCredentials: true }
+            );
 
-        const { amount, keyId, currency, notes, orderId } = order.data;
+            const { amount, keyId, currency, notes, orderId } = order.data;
 
-        const options = {
-            key: keyId,
-            amount,
-            currency,
-            name: "Dev Tinder",
-            description: "Connect to other developers",
-            order_id: orderId,
-            prefill: {
-                name: notes.firstName + " " + notes.lastName,
-                email: notes.emailId,
-                contact: "9999999999",
-            },
-            theme: {
-                color: "#F37254",
-            },
-            handler: verifyPremiumUser,
-        };
+            const options = {
+                key: keyId,
+                amount,
+                currency,
+                name: "Dev Tinder",
+                description: "Connect to other developers",
+                order_id: orderId,
+                prefill: {
+                    name: notes.firstName + " " + notes.lastName,
+                    email: notes.emailId,
+                    contact: "9999999999",
+                },
+                theme: {
+                    color: "#F37254",
+                },
+                handler: verifyPremiumPayment,
+            };
 
-        const rzp = new window.Razorpay(options);
-        rzp.open();
+            const rzp = new window.Razorpay(options);
+            rzp.open();
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return isUserPremium ? (
-        "You're are already a premium user") : (
+        <div className="min-h-[80vh] py-24 px-4 flex items-center justify-center bg-transparent">
+            {/* Animated Premium Celebration Card */}
+            <div className="relative p-10 md:p-14 w-full max-w-xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-amber-500/50 rounded-3xl shadow-[0_0_40px_rgba(245,158,11,0.3)] overflow-hidden group transition-transform hover:scale-[1.02] duration-500">
+                {/* Glowing Orbs */}
+                <div className="absolute -top-32 -right-32 w-64 h-64 bg-gradient-to-br from-amber-400 to-yellow-300 rounded-full mix-blend-multiply filter blur-[64px] opacity-40 animate-pulse"></div>
+                <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-gradient-to-br from-pink-500 to-rose-400 rounded-full mix-blend-multiply filter blur-[64px] opacity-40 animate-pulse" style={{ animationDelay: "1.5s" }}></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-tr from-amber-500/10 to-pink-500/10 opacity-50"></div>
+
+                <div className="relative z-10 flex flex-col items-center text-center">
+                    {/* Bouncing Crown with Glow */}
+                    <div className="mb-8 relative">
+                        <div className="absolute inset-0 bg-amber-400 blur-2xl opacity-60 animate-pulse"></div>
+                        <Crown size={88} className="text-amber-500 relative z-10 animate-bounce drop-shadow-[0_10px_15px_rgba(245,158,11,0.5)]" strokeWidth={1.5} />
+                    </div>
+
+                    {/* Birthday-like bold text */}
+                    <h2 className="text-4xl md:text-6xl font-black mb-4 bg-gradient-to-r from-amber-500 via-yellow-400 to-pink-500 text-transparent bg-clip-text pb-2">
+                        Woohoo!
+                    </h2>
+
+                    <p className="text-2xl md:text-3xl text-zinc-800 dark:text-zinc-100 font-bold mb-4">
+                        You're a Premium Member!
+                    </p>
+
+                    <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-md mx-auto leading-relaxed">
+                        No need to upgrade again. Enjoy your exclusive perks, endless connections, and priority features everyday. ✨
+                    </p>
+                </div>
+            </div>
+        </div>
+    ) : (
         <div className="min-h-[80vh] py-24 mb-10 px-4 flex flex-col items-center justify-center bg-transparent">
             <div className="text-center mb-16">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 pb-2 leading-tight bg-gradient-to-r from-pink-500 to-orange-400 text-transparent bg-clip-text inline-block">
