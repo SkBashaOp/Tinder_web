@@ -9,7 +9,7 @@ const Premium = () => {
     }, []);
 
     const verifyPremiumUser = async () => {
-        const res = await axios.get("/premium/verify", {
+        const res = await axios.get("/api/premium/verify", {
             withCredentials: true,
         });
 
@@ -20,7 +20,7 @@ const Premium = () => {
 
     const handleBuyClick = async (type) => {
         const order = await axios.post(
-            "/payment/create",
+            "/api/payment/create",
             {
                 membershipType: type,
             },
