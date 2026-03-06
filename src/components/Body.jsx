@@ -15,6 +15,8 @@ const Body = () => {
   const location = useLocation();
 
   const fetchUser = async () => {
+    const publicRoutes = ["/", "/login", "/privacy-policy", "/terms", "/refund-policy"];
+
     // If we have user data, we are authenticated.
     if (userData) {
       // If we are authenticated but sit on login or root, redirect to feed.
@@ -24,8 +26,11 @@ const Body = () => {
       return;
     }
 
-    // If we don't have user data and we are natively on / or /login,
-    // don't try to fetch user, as we will just get a 401 anyway.
+    // If we don't have user data and we are natively on public routes,
+    // don't try to fetch user unnecessarily if we don't want to force login,
+    // BUT we still want to fetch user if they have a session to show the navbar profile.
+    // However, to avoid 401 spam, let's only skip fetch for explicit non-app public pages 
+    // if we know they definitely have no cookie? Actually, fetching is fine, just don't redirect.
     if (!userData && (location.pathname === "/" || location.pathname === "/login")) {
       return;
     }
@@ -43,8 +48,8 @@ const Body = () => {
       }
     } catch (error) {
       if (error?.response?.status === 401) {
-        // Unauthenticated. Clear any residual local data if exists and force to login.
-        if (location.pathname !== "/login" && location.pathname !== "/") {
+        // Unauthenticated. Force to login only if it's not a public route.
+        if (!publicRoutes.includes(location.pathname)) {
           navigate("/login");
         }
       } else {
