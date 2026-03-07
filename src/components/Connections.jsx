@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Users, Code2, MapPin, X } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
+import { Link } from "react-router-dom";
 
 // Container animation variants
 const containerVariants = {
@@ -120,7 +121,9 @@ const Connections = () => {
                       <p className="text-sm text-muted-foreground line-clamp-2 mb-6 flex-1">
                         {connection.about}
                       </p>
-
+                      <Link to={"/chat/" + connection._id} className="w-full mb-2">
+                        <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white transition-colors tracking-wide font-semibold">Message</Button>
+                      </Link>
                       <Button variant="outline" size="sm" className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 border-red-100 group-hover:border-red-200 transition-colors">
                         <X size={14} className="mr-1.5" /> Remove Connection
                       </Button>
@@ -130,9 +133,10 @@ const Connections = () => {
               )
             })}
           </motion.div>
-        )}
-      </div>
-    </div>
+        )
+        }
+      </div >
+    </div >
   );
 };
 

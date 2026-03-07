@@ -12,6 +12,7 @@ import Premium from "./components/Premium";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 import TermsAndConditions from "./components/TermsAndConditions";
 import RefundPolicy from "./components/RefundPolicy";
+import Chat from "./components/chat";
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
             <Route path="/privacy-policy" element={<PrivacyPolicy />}></Route>
             <Route path="/terms" element={<TermsAndConditions />}></Route>
             <Route path="/refund-policy" element={<RefundPolicy />}></Route>
+            <Route path="/chat/:targetUserId" element={<Chat />} />
           </Route>
           <Route path="*" element={<ErrorPage />} />
         </Routes>
