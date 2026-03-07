@@ -145,15 +145,15 @@ const LandingPage = () => {
       <section className="py-10 border-y border-border/50 bg-white/20 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-6">
-            Developers from top companies have found matches
+            Developers building the future are connecting here
           </p>
           <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
             {/* Mock Company Vectors */}
-            <div className="text-2xl font-black font-serif">Google</div>
-            <div className="text-2xl font-black font-sans tracking-tighter">Meta</div>
-            <div className="text-2xl font-bold flex items-center gap-1"><CloudLightning /> Amazon</div>
-            <div className="text-2xl font-black italic">Netflix</div>
-            <div className="text-2xl font-black tracking-tight">Apple</div>
+            <div className="text-2xl font-black font-serif">Startup Engineers</div>
+            <div className="text-2xl font-black font-sans tracking-tighter">Open-Source Contributors</div>
+            <div className="text-2xl font-bold flex items-center gap-1"><CloudLightning /> Indie Hackers</div>
+            <div className="text-2xl font-black italic">System Architects</div>
+            <div className="text-2xl font-black tracking-tight">Tech Enthusiasts</div>
           </div>
         </div>
       </section>
@@ -210,7 +210,7 @@ const LandingPage = () => {
 
 // Simple cloud lightning icon mock since lucide CloudLightning might not be imported above
 const CloudLightning = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973" /><path d="m13 12-3 5h4l-3 5" /></svg>
+  <svg xmlns="https://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973" /><path d="m13 12-3 5h4l-3 5" /></svg>
 );
 
 export default LandingPage;
