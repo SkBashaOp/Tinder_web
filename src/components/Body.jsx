@@ -7,6 +7,7 @@ import Footer from "./Footer";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { addUser } from "../store/userSlice";
+import { onForegroundMessage, requestFirebaseNotificationPermission } from "../utils/firebaseClient";
 
 const Body = () => {
   const navigate = useNavigate();
@@ -26,11 +27,6 @@ const Body = () => {
       return;
     }
 
-    // If we don't have user data and we are natively on public routes,
-    // don't try to fetch user unnecessarily if we don't want to force login,
-    // BUT we still want to fetch user if they have a session to show the navbar profile.
-    // However, to avoid 401 spam, let's only skip fetch for explicit non-app public pages 
-    // if we know they definitely have no cookie? Actually, fetching is fine, just don't redirect.
     if (!userData && (location.pathname === "/" || location.pathname === "/login")) {
       return;
     }
@@ -48,7 +44,6 @@ const Body = () => {
       }
     } catch (error) {
       if (error?.response?.status === 401) {
-        // Unauthenticated. Force to login only if it's not a public route.
         if (!publicRoutes.includes(location.pathname)) {
           navigate("/login");
         }
@@ -60,7 +55,21 @@ const Body = () => {
 
   useEffect(() => {
     fetchUser();
-  }, [location.pathname]); // Only re-run on route changes, not on every Redux dispatch
+  }, [location.pathname]);
+
+  useEffect(() => {
+    // Start listening globally for push notifications when the app is active
+    const unsubscribe = onForegroundMessage();
+
+    // Ensure the Firebase messaging token is active in this session
+    if (userData) {
+      requestFirebaseNotificationPermission();
+    }
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [userData]);
 
   return (
     <div className="w-screen min-h-screen bg-c">

@@ -1,7 +1,7 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addConnection } from "../store/connectionSlice";
+import { addConnection, removeConnection } from "../store/connectionSlice";
 import { motion } from "framer-motion";
 import { Users, Code2, MapPin, X } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
@@ -27,6 +27,7 @@ const itemVariants = {
 const Connections = () => {
   const dispatch = useDispatch();
   const connections = useSelector((store) => store.connection);
+  const [removing, setRemoving] = useState({});
 
   const fetchConnections = async () => {
     try {
@@ -37,6 +38,20 @@ const Connections = () => {
       dispatch(addConnection(res?.data?.data));
     } catch (error) {
       console.error("Failed to fetch connections", error);
+    }
+  };
+
+  const handleRemove = async (userId) => {
+    setRemoving((prev) => ({ ...prev, [userId]: true }));
+    try {
+      await axios.delete(`/api/request/remove/${userId}`, {
+        withCredentials: true,
+      });
+      dispatch(removeConnection(userId));
+    } catch (error) {
+      console.error("Failed to remove connection", error);
+    } finally {
+      setRemoving((prev) => ({ ...prev, [userId]: false }));
     }
   };
 
@@ -124,8 +139,15 @@ const Connections = () => {
                       <Link to={"/chat/" + connection._id} className="w-full mb-2">
                         <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white transition-colors tracking-wide font-semibold">Message</Button>
                       </Link>
-                      <Button variant="outline" size="sm" className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 border-red-100 group-hover:border-red-200 transition-colors">
-                        <X size={14} className="mr-1.5" /> Remove Connection
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 border-red-100 group-hover:border-red-200 transition-colors"
+                        onClick={() => handleRemove(connection._id)}
+                        disabled={removing[connection._id]}
+                      >
+                        <X size={14} className="mr-1.5" />
+                        {removing[connection._id] ? "Removing..." : "Remove Connection"}
                       </Button>
                     </CardContent>
                   </Card>

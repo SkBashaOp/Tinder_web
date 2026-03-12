@@ -5,17 +5,22 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, ArrowLeft, Phone, Video, Info, MoreVertical } from "lucide-react";
+import { requestFirebaseNotificationPermission } from "../utils/firebaseClient";
 
 const Chat = () => {
     const { targetUserId } = useParams();
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
     const [targetName, setTargetName] = useState("Your Match");
+    const [targetPhoto, setTargetPhoto] = useState(null);
+    const [typingUser, setTypingUser] = useState("");
+    const [onlineUsers, setOnlineUsers] = useState([]);
     const user = useSelector((store) => store.user);
     const loginUser = user?.loginUser;
     const userId = loginUser?._id;
     const scrollRef = useRef(null);
     const socketRef = useRef(null);
+    const typingTimeoutRef = useRef(null);
 
     // ── Load historical messages from DB ────────────────────────────────────
     useEffect(() => {
@@ -25,12 +30,14 @@ const Chat = () => {
             .get("/api/chat/" + targetUserId, { withCredentials: true })
             .then((res) => {
                 const msgs = (res?.data?.messages || []).map((msg) => {
-                    const { senderId, text } = msg;
+                    const { senderId, text, seen } = msg;
                     return {
                         firstName: senderId?.firstName,
                         lastName: senderId?.lastName,
+                        photoUrl: senderId?.photoUrl,
                         senderId: senderId?._id?.toString() || senderId?.toString(),
                         text,
+                        seen,
                     };
                 });
                 setMessages(msgs);
@@ -42,6 +49,9 @@ const Chat = () => {
             .then((res) => {
                 if (res.data?.firstName) {
                     setTargetName(res.data.firstName + " " + (res.data.lastName || ""));
+                    if (res.data.photoUrl) {
+                        setTargetPhoto(res.data.photoUrl);
+                    }
                 }
             })
             .catch(() => {/* non-critical */ });
@@ -50,6 +60,9 @@ const Chat = () => {
     // ── Socket connection ────────────────────────────────────────────────────
     useEffect(() => {
         if (!userId || !targetUserId) return;
+
+        // Ensure user device is mapped to DB for offline Push Notifications
+        requestFirebaseNotificationPermission();
 
         const socket = createSocketConnection();
         socketRef.current = socket;
@@ -62,14 +75,41 @@ const Chat = () => {
                 userId,
                 targetUserId,
             });
+            // Mark existing messages from target as seen
+            socket.emit("messagesSeen", { userId, targetUserId });
         });
 
-        socket.on("messageReceived", ({ firstName, lastName, text, senderId }) => {
+        socket.on("onlineUsers", (users) => {
+            setOnlineUsers(users);
+        });
+
+        socket.on("userTyping", ({ firstName }) => {
+            setTypingUser(firstName);
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = setTimeout(() => {
+                setTypingUser("");
+            }, 2000);
+        });
+
+        socket.on("messagesMarkedAsSeen", ({ seenByUserId }) => {
+            if (seenByUserId === targetUserId) {
+                setMessages((prev) => prev.map((msg) =>
+                    msg.senderId === userId ? { ...msg, seen: true } : msg
+                ));
+            }
+        });
+
+        socket.on("messageReceived", ({ firstName, lastName, photoUrl, text, senderId }) => {
             console.log("[socket] messageReceived:", text);
             setMessages((prev) => [
                 ...prev,
-                { firstName, lastName, text, senderId: senderId?.toString() },
+                { firstName, lastName, photoUrl, text, senderId: senderId?.toString() },
             ]);
+
+            // Auto mark as seen since we are in the chat room
+            if (senderId === targetUserId) {
+                socket.emit("messagesSeen", { userId, targetUserId });
+            }
         });
 
         socket.on("connect_error", (err) => {
@@ -77,8 +117,16 @@ const Chat = () => {
         });
 
         return () => {
-            console.log("[socket] disconnecting");
-            socket.disconnect();
+            if (socket) {
+                console.log("[socket] disconnecting");
+                socket.off("connect");
+                socket.off("onlineUsers");
+                socket.off("userTyping");
+                socket.off("messagesMarkedAsSeen");
+                socket.off("messageReceived");
+                socket.off("connect_error");
+                socket.disconnect();
+            }
             socketRef.current = null;
         };
     }, [userId, targetUserId]);
@@ -91,6 +139,15 @@ const Chat = () => {
     }, [messages]);
 
     // ── Send message ─────────────────────────────────────────────────────────
+    const handleTyping = () => {
+        if (!socketRef.current?.connected) return;
+        socketRef.current.emit("typing", {
+            userId,
+            targetUserId,
+            firstName: loginUser?.firstName || ""
+        });
+    };
+
     const sendMessage = () => {
         const text = newMessage.trim();
         if (!text || !socketRef.current?.connected) {
@@ -100,6 +157,7 @@ const Chat = () => {
         socketRef.current.emit("sendMessage", {
             firstName: loginUser?.firstName || "",
             lastName: loginUser?.lastName || "",
+            photoUrl: loginUser?.photoUrl || "",
             userId,
             targetUserId,
             text,
@@ -138,15 +196,19 @@ const Chat = () => {
                         </Link>
                         <div className="relative">
                             <img
-                                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${targetUserId}`}
+                                src={targetPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${targetUserId}`}
                                 alt="User Avatar"
                                 className="w-12 h-12 rounded-full border-2 border-pink-500 object-cover bg-zinc-100 dark:bg-zinc-800"
                             />
-                            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-zinc-900 rounded-full"></div>
+                            <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 border-2 border-white dark:border-zinc-900 rounded-full ${onlineUsers.includes(targetUserId) ? "bg-green-500" : "bg-red-500"}`}></div>
                         </div>
                         <div>
                             <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{targetName}</h2>
-                            <p className="text-xs text-green-500 font-medium">Online</p>
+                            {onlineUsers.includes(targetUserId) ? (
+                                <p className="text-xs text-green-500 font-medium">Online</p>
+                            ) : (
+                                <p className="text-xs text-zinc-400 font-medium">Offline</p>
+                            )}
                         </div>
                     </div>
                     <div className="flex items-center gap-2 md:gap-4 text-zinc-500 dark:text-zinc-400">
@@ -175,25 +237,59 @@ const Chat = () => {
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         className={`flex w-full ${isMine ? "justify-end" : "justify-start"}`}
                                     >
-                                        <div className={`flex flex-col max-w-[75%] md:max-w-[60%] ${isMine ? "items-end" : "items-start"}`}>
-                                            {!isMine && msg.firstName && (
-                                                <span className="text-xs text-zinc-500 font-medium ml-1 mb-1">
-                                                    {msg.firstName}
-                                                </span>
-                                            )}
-                                            <div
-                                                className={`px-5 py-3 rounded-2xl shadow-sm text-sm ${isMine
-                                                    ? "bg-gradient-to-br from-pink-500 to-amber-500 text-white rounded-br-sm"
-                                                    : "bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 border border-zinc-100 dark:border-zinc-700/50 rounded-bl-sm"
-                                                    }`}
-                                                style={{ wordBreak: "break-word" }}
-                                            >
-                                                {msg.text}
+                                        <div className={`flex max-w-[85%] md:max-w-[70%] gap-2 ${isMine ? "flex-row-reverse" : "flex-row"}`}>
+                                            <img
+                                                src={msg.photoUrl || (isMine ? loginUser?.photoUrl : `https://api.dicebear.com/7.x/avataaars/svg?seed=${msg.senderId}`)}
+                                                alt="avatar"
+                                                className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-800 object-cover mt-auto flex-shrink-0"
+                                            />
+                                            <div className={`flex flex-col ${isMine ? "items-end" : "items-start"}`}>
+                                                {!isMine && msg.firstName && (
+                                                    <span className="text-xs text-zinc-500 font-medium ml-1 mb-1">
+                                                        {msg.firstName}
+                                                    </span>
+                                                )}
+                                                <div
+                                                    className={`px-5 py-3 rounded-2xl shadow-sm text-sm ${isMine
+                                                        ? "bg-gradient-to-br from-pink-500 to-amber-500 text-white rounded-br-sm"
+                                                        : "bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 border border-zinc-100 dark:border-zinc-700/50 rounded-bl-sm"
+                                                        }`}
+                                                    style={{ wordBreak: "break-word" }}
+                                                >
+                                                    {msg.text}
+                                                </div>
+                                                {isMine && msg.seen && (
+                                                    <span className="text-[10px] text-blue-500/80 font-medium ml-2 mt-1 self-end flex items-center gap-0.5">
+                                                        <svg viewBox="0 0 24 24" fill="none" className="w-3 h-3 stroke-current stroke-2"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7M5 18l4 4L19 12" /></svg>
+                                                        Seen
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </motion.div>
                                 );
                             })}
+
+                            {typingUser && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    className="flex w-full justify-start"
+                                >
+                                    <div className="flex gap-2 min-w-0 max-w-[85%] md:max-w-[70%]">
+                                        <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex-shrink-0 animate-pulse border border-zinc-200 dark:border-zinc-800"></div>
+                                        <div className="bg-white dark:bg-zinc-800 text-zinc-500 px-5 py-3 border border-zinc-100 dark:border-zinc-700/50 rounded-2xl rounded-bl-sm text-sm flex items-center gap-1.5 w-fit shadow-sm h-10 mt-auto">
+                                            <span className="italic text-xs">{typingUser} is typing</span>
+                                            <span className="flex gap-0.5 ml-1">
+                                                <span className="w-1 h-1 rounded-full bg-zinc-400 animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                                                <span className="w-1 h-1 rounded-full bg-zinc-400 animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                                                <span className="w-1 h-1 rounded-full bg-zinc-400 animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
                         </AnimatePresence>
                     )}
                 </div>
@@ -203,7 +299,10 @@ const Chat = () => {
                     <input
                         type="text"
                         value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
+                        onChange={(e) => {
+                            setNewMessage(e.target.value);
+                            handleTyping();
+                        }}
                         onKeyDown={handleKeyDown}
                         placeholder="Type a message..."
                         className="flex-1 bg-zinc-100 dark:bg-zinc-800/80 border-none rounded-full px-6 py-3.5 text-sm md:text-base text-zinc-800 dark:text-zinc-100 outline-none focus:ring-2 focus:ring-pink-500/50 transition-all placeholder:text-zinc-400"
