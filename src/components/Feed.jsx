@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addFeed } from "../store/feedSlice";
@@ -26,10 +26,7 @@ const Feed = () => {
   const getFeed = async (pageNumber) => {
     if (!hasMore) return;
     try {
-      const res = await axios.get(
-        `/api/user/feed?page=${pageNumber}&limit=10`,
-        { withCredentials: true }
-      );
+      const res = await axiosInstance.get(`/user/feed?page=${pageNumber}&limit=10`);
 
       const newUsers = res?.data?.data || [];
       if (newUsers.length === 0) {

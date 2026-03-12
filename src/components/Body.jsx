@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { addUser } from "../store/userSlice";
 import { onForegroundMessage, requestFirebaseNotificationPermission } from "../utils/firebaseClient";
 
@@ -32,10 +32,7 @@ const Body = () => {
     }
 
     try {
-      const res = await axios.get(
-        "/api/profile/view",
-        { withCredentials: true }
-      );
+      const res = await axiosInstance.get("/profile/view");
 
       dispatch(addUser(res.data));
 

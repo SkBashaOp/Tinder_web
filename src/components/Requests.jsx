@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addRequest, removRequestOnAccept } from "../store/requestSlice";
@@ -26,10 +26,7 @@ const Requests = () => {
 
   const fetchRequests = async () => {
     try {
-      const res = await axios.get(
-        "/api/user/request/received",
-        { withCredentials: true }
-      );
+      const res = await axiosInstance.get("/user/request/received");
       dispatch(addRequest(res?.data?.allReceivedRequest));
     } catch (error) {
       console.error("Failed to fetch requests", error);
@@ -38,11 +35,7 @@ const Requests = () => {
 
   const handleAction = async (status, id) => {
     try {
-      await axios.post(
-        `/api/request/review/${status}/${id}`,
-        {},
-        { withCredentials: true }
-      );
+      await axiosInstance.post(`/request/review/${status}/${id}`, {});
       // Remove from UI
       dispatch(removRequestOnAccept(id));
     } catch (error) {

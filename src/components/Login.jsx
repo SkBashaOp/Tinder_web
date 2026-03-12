@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addUser } from "../store/userSlice";
@@ -35,12 +35,12 @@ const Login = () => {
     setLoading(true);
     try {
       if (isLogin) {
-        const res = await axios.post("/api/login", { emailId, password }, { withCredentials: true });
+        const res = await axiosInstance.post("/login", { emailId, password });
         dispatch(addUser(res.data));
         toast.success(res.data?.message || "Welcome back!");
         navigate("/feed");
       } else {
-        const res = await axios.post("/api/signup", { firstName, lastName, emailId, password }, { withCredentials: true });
+        const res = await axiosInstance.post("/signup", { firstName, lastName, emailId, password });
         dispatch(addUser(res.data));
         toast.success(res.data?.message || "Account created successfully!");
         navigate("/profile");

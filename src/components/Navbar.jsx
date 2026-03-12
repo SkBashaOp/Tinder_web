@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
@@ -40,11 +40,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await axios.post(
-        "/api/logout",
-        {},
-        { withCredentials: true }
-      );
+      const res = await axiosInstance.post("/logout", {});
 
       dispatch(removeUser());
       dispatch(removeFeed());

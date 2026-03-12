@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnection, removeConnection } from "../store/connectionSlice";
@@ -31,10 +31,7 @@ const Connections = () => {
 
   const fetchConnections = async () => {
     try {
-      const res = await axios.get(
-        "/api/user/request/accepted",
-        { withCredentials: true }
-      );
+      const res = await axiosInstance.get("/user/request/accepted");
       dispatch(addConnection(res?.data?.data));
     } catch (error) {
       console.error("Failed to fetch connections", error);
@@ -44,9 +41,7 @@ const Connections = () => {
   const handleRemove = async (userId) => {
     setRemoving((prev) => ({ ...prev, [userId]: true }));
     try {
-      await axios.delete(`/api/request/remove/${userId}`, {
-        withCredentials: true,
-      });
+      await axiosInstance.delete(`/request/remove/${userId}`);
       dispatch(removeConnection(userId));
     } catch (error) {
       console.error("Failed to remove connection", error);

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { useState, useEffect } from "react";
 import { Check, Star, Crown, Zap } from "lucide-react";
 import { motion } from "framer-motion";
@@ -34,9 +34,7 @@ const Premium = () => {
 
     const checkPremiumStatus = async () => {
         try {
-            const res = await axios.get("/api/premium/verify", {
-                withCredentials: true,
-            });
+            const res = await axiosInstance.get("/premium/verify");
             if (res.data.isPremium && res.data.membershipType && res.data.membershipType !== "boost") {
                 setIsUserPremium(true);
                 setMembershipType(res.data.membershipType);
@@ -84,14 +82,13 @@ const Premium = () => {
 
     const verifyPremiumPayment = async (response) => {
         try {
-            const res = await axios.post(
-                "/api/payment/verify",
+            const res = await axiosInstance.post(
+                "/payment/verify",
                 {
                     razorpay_payment_id: response.razorpay_payment_id,
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_signature: response.razorpay_signature,
                 },
-                { withCredentials: true }
             );
 
             if (res.data?.msg === "Payment verified successfully") {
@@ -134,12 +131,11 @@ const Premium = () => {
         }
 
         try {
-            const order = await axios.post(
-                "/api/payment/create",
+            const order = await axiosInstance.post(
+                "/payment/create",
                 {
                     membershipType: type,
                 },
-                { withCredentials: true }
             );
 
             const { amount, keyId, currency, notes, orderId } = order.data;

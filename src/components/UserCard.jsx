@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../store/feedSlice";
@@ -153,11 +153,7 @@ const UserCard = ({ feed }) => {
     }, 300);
 
     try {
-      await axios.post(
-        `/api/request/send/${status}/${safeId}`,
-        {},
-        { withCredentials: true }
-      );
+      await axiosInstance.post(`/request/send/${status}/${safeId}`, {});
     } catch (error) {
       const statusCode = error?.response?.status;
       const responseData = error?.response?.data;

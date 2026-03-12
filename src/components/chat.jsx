@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { createSocketConnection } from "../utils/socket";
 import { useSelector } from "react-redux";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, ArrowLeft, Phone, Video, Info, MoreVertical } from "lucide-react";
 import { requestFirebaseNotificationPermission } from "../utils/firebaseClient";
@@ -26,8 +26,8 @@ const Chat = () => {
     useEffect(() => {
         if (!targetUserId) return;
 
-        axios
-            .get("/api/chat/" + targetUserId, { withCredentials: true })
+        axiosInstance
+            .get("/chat/" + targetUserId)
             .then((res) => {
                 const msgs = (res?.data?.messages || []).map((msg) => {
                     const { senderId, text, seen } = msg;
@@ -44,8 +44,8 @@ const Chat = () => {
             })
             .catch((err) => console.error("fetchChat error:", err));
 
-        axios
-            .get("/api/user/" + targetUserId, { withCredentials: true })
+        axiosInstance
+            .get("/user/" + targetUserId)
             .then((res) => {
                 if (res.data?.firstName) {
                     setTargetName(res.data.firstName + " " + (res.data.lastName || ""));

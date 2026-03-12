@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { addUser } from "../store/userSlice";
@@ -101,11 +101,7 @@ const EditProfile = ({ user }) => {
         about: about.trim(),
       };
 
-      const res = await axios.patch(
-        "/api/profile/edit",
-        payload,
-        { withCredentials: true }
-      );
+      const res = await axiosInstance.patch("/profile/edit", payload);
 
       // Wrap in the same shape that Body.jsx uses so the Navbar keeps working:
       // Redux user state is always { message, loginUser: {...} }
