@@ -15,6 +15,9 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      modulePreload: {
+        polyfill: true
+      },
       output: {
         manualChunks: {
           react: ["react", "react-dom"],
