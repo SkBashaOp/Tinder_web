@@ -39,7 +39,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-border/50 text-center text-xs text-muted-foreground/70">
-        DevFind is an independent developer project and is not affiliated with Tinder or Match Group.
+        DevFind is an independent developer project and is not affiliated with ANYONE.
       </div>
     </footer>
   );
