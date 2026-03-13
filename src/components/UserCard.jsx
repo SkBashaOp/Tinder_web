@@ -75,7 +75,7 @@ const DraggableCard = ({ profile, handlePendingRequest }) => {
 
           <div className="absolute inset-0 bg-zinc-200 dark:bg-zinc-800 pointer-events-none">
             <img
-              src={photoUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=devtinder"}
+              src={photoUrl}
               alt={`${firstName} ${lastName}`}
               className="w-full h-full object-cover"
               draggable={false}

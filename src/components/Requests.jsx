@@ -119,7 +119,7 @@ const Requests = () => {
 
                         <div className="relative flex-shrink-0">
                           <img
-                            src={request.fromUserId.photoUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=devtinder"}
+                            src={request.fromUserId.photoUrl}
                             alt="User"
                             className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover shadow-sm bg-white dark:bg-zinc-800"
                           />

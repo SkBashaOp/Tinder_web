@@ -164,7 +164,7 @@ const LandingPage = () => {
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Built for Developers.</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              devTinder isn't just another dating app. It's a platform built specifically to match you based on what really matters: your tech stack.
+              devFind isn't just another dating app. It's a platform built specifically to match you based on what really matters: your tech stack.
             </p>
           </div>
 
@@ -197,9 +197,9 @@ const LandingPage = () => {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <Flame size={48} className="mx-auto text-pink-500 mb-8" />
           <h2 className="text-4xl md:text-6xl font-black mb-8">Ready to find your match?</h2>
-          <Link to="/login" aria-label="Join devTinder Now - Footer Section">
+          <Link to="/login" aria-label="Join devFind Now - Footer Section">
             <Button variant="romantic" size="lg" className="h-16 px-10 text-xl font-bold rounded-full shadow-2xl hover:scale-105 transition-transform duration-300">
-              Join devTinder Now
+              Join devFind Now
             </Button>
           </Link>
         </div>

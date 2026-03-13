@@ -74,7 +74,7 @@ const Navbar = () => {
             <Flame size={24} strokeWidth={2.5} />
           </motion.div>
           <span className="text-2xl font-bold tracking-tight text-romantic">
-            devTinder
+            devFind
           </span>
         </Link>
 
@@ -94,7 +94,7 @@ const Navbar = () => {
             >
               <img
                 alt="Avatar"
-                src={user?.loginUser?.photoUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=devtinder"}
+                src={user?.loginUser?.photoUrl}
                 className="w-10 h-10 rounded-full object-cover"
               />
             </button>

@@ -103,7 +103,7 @@ const Connections = () => {
                     <div className="h-24 bg-romantic-gradient relative">
                       <div className="absolute -bottom-10 left-6">
                         <img
-                          src={connection.photoUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=devtinder"}
+                          src={connection.photoUrl}
                           alt="User"
                           className="w-20 h-20 rounded-2xl border-4 border-white dark:border-zinc-900 object-cover shadow-md bg-white dark:bg-zinc-800"
                         />

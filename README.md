@@ -1,6 +1,6 @@
-# 🔥 devTinder
+# 🔥 devfind
 
-**devTinder** is a platform designed specifically for developers to connect, network, and find potential collaborators or friends in the tech industry. It features a modern, Tinder-like swipe interface built with React and a robust Node.js backend.
+**devFind** is a platform designed specifically for developers to connect, network, and find potential collaborators or friends in the tech industry. It features a modern, Tinder-like swipe interface built with React and a robust Node.js backend.
 
 ---
 

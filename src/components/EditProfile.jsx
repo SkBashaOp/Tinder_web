@@ -178,7 +178,7 @@ const EditProfile = ({ user }) => {
                   <div className="relative group">
                     <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-background shadow-md bg-zinc-200 dark:bg-zinc-800">
                       <img
-                        src={photoPreview || photoUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=devtinder"}
+                        src={photoPreview || photoUrl}
                         alt="Profile Preview"
                         className="w-full h-full object-cover transition-transform group-hover:scale-110"
                       />

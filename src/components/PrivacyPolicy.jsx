@@ -12,7 +12,7 @@ const PrivacyPolicy = () => {
                     <section>
                         <p className="text-sm text-zinc-500 mb-4">Last updated: {new Date().toLocaleDateString()}</p>
                         <p>
-                            Welcome to devTinder. We are committed to protecting and respecting your privacy. This Privacy Policy covers the experience we provide for users of our platform.
+                            Welcome to devFind. We are committed to protecting and respecting your privacy. This Privacy Policy covers the experience we provide for users of our platform.
                         </p>
                     </section>
 
@@ -41,7 +41,7 @@ const PrivacyPolicy = () => {
                     <section>
                         <h2 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100 mb-4">3. How we share your information</h2>
                         <p>
-                            We only share your public profile data (name, skills, gender, age, about, and photo) with other users of devTinder to facilitate connections. We do not sell your personal data to third parties. We may disclose your information where we are legally required to do so.
+                            We only share your public profile data (name, skills, gender, age, about, and photo) with other users of devFind to facilitate connections. We do not sell your personal data to third parties. We may disclose your information where we are legally required to do so.
                         </p>
                     </section>
 
@@ -55,7 +55,7 @@ const PrivacyPolicy = () => {
                     <section>
                         <h2 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100 mb-4">5. Contact Us</h2>
                         <p>
-                            If you have any questions or concerns about this policy, please contact us at support@devtinder.com.
+                            If you have any questions or concerns about this policy, please contact us at support@devfind.com.
                         </p>
                     </section>
                 </div>

@@ -12,7 +12,7 @@ const Footer = () => {
               <Flame size={20} />
             </div>
             <span className="text-xl font-bold tracking-tight text-romantic">
-              devTinder
+              devFind
             </span>
           </div>
           <p className="text-sm text-muted-foreground max-w-sm text-center md:text-left">
@@ -39,7 +39,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-border/50 text-center text-xs text-muted-foreground/70">
-        DevTinder is an independent developer project and is not affiliated with Tinder or Match Group.
+        DevFind is an independent developer project and is not affiliated with Tinder or Match Group.
       </div>
     </footer>
   );

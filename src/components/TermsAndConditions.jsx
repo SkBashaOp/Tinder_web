@@ -12,14 +12,14 @@ const TermsAndConditions = () => {
                     <section>
                         <p className="text-sm text-zinc-500 mb-4">Last updated: {new Date().toLocaleDateString()}</p>
                         <p>
-                            By accessing and using devTinder (the "Platform"), you agree to the following terms and conditions. If you do not agree with any of these terms, please do not use our Platform.
+                            By accessing and using devFind (the "Platform"), you agree to the following terms and conditions. If you do not agree with any of these terms, please do not use our Platform.
                         </p>
                     </section>
 
                     <section>
                         <h2 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100 mb-4">1. Eligibility</h2>
                         <p>
-                            You must be at least 18 years of age to create an account on devTinder. By creating an account, you represent and warrant that you meet this requirement.
+                            You must be at least 18 years of age to create an account on devFind. By creating an account, you represent and warrant that you meet this requirement.
                         </p>
                     </section>
 
@@ -37,7 +37,7 @@ const TermsAndConditions = () => {
                     <section>
                         <h2 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100 mb-4">3. User Content</h2>
                         <p>
-                            You retain all ownership rights to the content you post on devTinder. However, by posting content, you grant us a worldwide, non-exclusive, royalty-free license to use, copy, display, and distribute that content in connection with providing the Service.
+                            You retain all ownership rights to the content you post on devFind. However, by posting content, you grant us a worldwide, non-exclusive, royalty-free license to use, copy, display, and distribute that content in connection with providing the Service.
                         </p>
                     </section>
 
@@ -51,7 +51,7 @@ const TermsAndConditions = () => {
                     <section>
                         <h2 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100 mb-4">5. Disclaimer of Liability</h2>
                         <p>
-                            devTinder is not responsible for the conduct of any user on or off the Platform. We do not conduct criminal background checks on our users. Use your best judgment and prioritize your safety when interacting with others.
+                            devFind is not responsible for the conduct of any user on or off the Platform. We do not conduct criminal background checks on our users. Use your best judgment and prioritize your safety when interacting with others.
                         </p>
                     </section>
                 </div>
