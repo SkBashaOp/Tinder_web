@@ -23,6 +23,7 @@ const Feed = () => {
   const dispatch = useDispatch();
   const [page, setPage] = React.useState(1);
   const [hasMore, setHasMore] = React.useState(true);
+  const [isFetching, setIsFetching] = React.useState(false);
   const location = useLocation();
 
   const getFeed = async (pageNumber) => {
@@ -45,11 +46,13 @@ const Feed = () => {
   useEffect(() => {
     setPage(1);
     setHasMore(true);
-    dispatch(addFeed(null));
+    // Do not set feed to null immediately, instead use isFetching flag
+    // so we don't flash the empty message
     getFeedFresh(1);
   }, [location.key]);
 
   const getFeedFresh = async (pageNumber) => {
+    setIsFetching(true);
     try {
       const res = await axiosInstance.get(`/user/feed?page=${pageNumber}&limit=10`);
       const newUsers = res?.data?.data || [];
@@ -59,6 +62,8 @@ const Feed = () => {
       dispatch(addFeed(newUsers));
     } catch (error) {
       console.error("Failed to load feed", error);
+    } finally {
+      setIsFetching(false);
     }
   };
 
@@ -89,8 +94,12 @@ const Feed = () => {
           <h1 className="text-2xl font-bold tracking-tight">Your Matches</h1>
         </div>
 
-        {!feed ? (
+        {isFetching || !feed ? (
           <CardSkeleton />
+        ) : feed.length === 0 ? (
+          <div className="relative w-full pb-32">
+            <UserCard feed={feed} />
+          </div>
         ) : (
           <div className="relative w-full pb-32">
             <UserCard feed={feed} />
