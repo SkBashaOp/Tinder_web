@@ -27,7 +27,8 @@ const Feed = () => {
   const location = useLocation();
 
   const getFeed = async (pageNumber) => {
-    if (!hasMore) return;
+    if (!hasMore || isFetching) return;
+    setIsFetching(true);
     try {
       const res = await axiosInstance.get(`/user/feed?page=${pageNumber}&limit=10`);
 
@@ -39,6 +40,8 @@ const Feed = () => {
       dispatch(addFeed(newUsers));
     } catch (error) {
       console.error("Failed to load feed", error);
+    } finally {
+      setIsFetching(false);
     }
   };
 
@@ -69,12 +72,12 @@ const Feed = () => {
 
   useEffect(() => {
     // Refetch next page when feed runs out (all cards swiped)
-    if (feed && feed.length === 0 && hasMore) {
+    if (feed && feed.length === 0 && hasMore && !isFetching) {
       const nextPage = page + 1;
       setPage(nextPage);
       getFeed(nextPage);
     }
-  }, [feed]);
+  }, [feed, hasMore, isFetching, page]);
 
   return (
     <div className="min-h-screen pt-32 pb-24 px-4 bg-[#fafafa] dark:bg-zinc-950 flex flex-col items-center overflow-hidden">
