@@ -26,6 +26,7 @@ const ThemeToggle = () => {
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className="w-9 h-9 rounded-full flex items-center justify-center bg-muted hover:bg-accent transition-colors"
       title="Toggle theme"
+      aria-label="Toggle theme"
     >
       {isDark ? <Sun size={16} className="text-yellow-400" /> : <Moon size={16} className="text-slate-600" />}
     </motion.button>
@@ -64,7 +65,7 @@ const Navbar = () => {
       className="fixed top-0 left-0 right-0 z-50 px-6 py-4 backdrop-blur-md bg-white/60 dark:bg-black/60 border-b border-border/50 shadow-sm"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 group">
+        <Link to="/" className="flex items-center gap-2 group" aria-label="Go to homepage">
           <motion.div
             whileHover={{ scale: 1.1, rotate: 15 }}
             transition={{ type: "spring", stiffness: 300 }}
@@ -88,6 +89,8 @@ const Navbar = () => {
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="relative rounded-full border-2 border-transparent dark:border-white/20 hover:border-pink-500 dark:hover:border-pink-500 transition-all focus:outline-none ring-2 ring-transparent dark:ring-white/10"
+              aria-label="Open user menu"
+              aria-expanded={dropdownOpen}
             >
               <img
                 alt="Avatar"

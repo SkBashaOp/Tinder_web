@@ -132,7 +132,7 @@ const Connections = () => {
                       <p className="text-sm text-muted-foreground line-clamp-2 mb-6 flex-1">
                         {connection.about}
                       </p>
-                      <Link to={"/chat/" + connection._id} className="w-full mb-2">
+                      <Link to={"/chat/" + connection._id} className="w-full mb-2" aria-label={`Message ${connection.firstName} ${connection.lastName}`}>
                         <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white transition-colors tracking-wide font-semibold">Message</Button>
                       </Link>
                       <Button
@@ -141,6 +141,7 @@ const Connections = () => {
                         className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 border-red-100 group-hover:border-red-200 transition-colors"
                         onClick={() => handleRemove(connection._id)}
                         disabled={removing[connection._id]}
+                        aria-label={`Remove connection with ${connection.firstName} ${connection.lastName}`}
                       >
                         <X size={14} className="mr-1.5" />
                         {removing[connection._id] ? "Removing..." : "Remove Connection"}

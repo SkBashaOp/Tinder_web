@@ -155,6 +155,7 @@ const Requests = () => {
                           <Button
                             onClick={() => handleAction("accepted", request._id)}
                             className="flex-1 sm:w-32 bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/20 shadow-md font-semibold"
+                            aria-label={`Accept request from ${request.fromUserId.firstName} ${request.fromUserId.lastName}`}
                           >
                             <Check size={18} className="mr-2" /> Accept
                           </Button>
@@ -162,6 +163,7 @@ const Requests = () => {
                             variant="outline"
                             onClick={() => handleAction("rejected", request._id)}
                             className="flex-1 sm:w-32 text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200"
+                            aria-label={`Reject request from ${request.fromUserId.firstName} ${request.fromUserId.lastName}`}
                           >
                             <X size={18} className="mr-2" /> Reject
                           </Button>

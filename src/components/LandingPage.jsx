@@ -108,7 +108,7 @@ const LandingPage = () => {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
           >
-            <Link to="/login" className="w-full sm:w-auto">
+            <Link to="/login" className="w-full sm:w-auto" aria-label="Create Account - Hero Section">
               <Button variant="romantic" size="lg" className="w-full sm:w-auto text-lg h-14 px-8 rounded-full font-bold group">
                 Create Account
                 <ChevronRight className="ml-2 group-hover:translate-x-1 transition-transform" />
@@ -197,7 +197,7 @@ const LandingPage = () => {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <Flame size={48} className="mx-auto text-pink-500 mb-8" />
           <h2 className="text-4xl md:text-6xl font-black mb-8">Ready to find your match?</h2>
-          <Link to="/login">
+          <Link to="/login" aria-label="Join devTinder Now - Footer Section">
             <Button variant="romantic" size="lg" className="h-16 px-10 text-xl font-bold rounded-full shadow-2xl hover:scale-105 transition-transform duration-300">
               Join devTinder Now
             </Button>

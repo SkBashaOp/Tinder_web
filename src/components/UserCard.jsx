@@ -121,6 +121,7 @@ const DraggableCard = ({ profile, handlePendingRequest }) => {
             whileTap={{ scale: 0.9 }}
             onClick={() => manualSwipe("left")}
             disabled={exitX !== 0}
+            aria-label={`Ignore ${firstName} ${lastName}`}
             className="w-16 h-16 rounded-full bg-white dark:bg-zinc-800 text-red-500 flex items-center justify-center shadow-xl border border-red-100 dark:border-red-900/30 disabled:opacity-50"
           >
             <X size={32} strokeWidth={3} />
@@ -131,6 +132,7 @@ const DraggableCard = ({ profile, handlePendingRequest }) => {
             whileTap={{ scale: 0.9 }}
             onClick={() => manualSwipe("right")}
             disabled={exitX !== 0}
+            aria-label={`Show interest in ${firstName} ${lastName}`}
             className="w-16 h-16 rounded-full bg-white dark:bg-zinc-800 text-emerald-500 flex items-center justify-center shadow-xl border border-emerald-100 dark:border-emerald-900/30 disabled:opacity-50"
           >
             <Heart size={32} strokeWidth={3} className="fill-emerald-500" />

@@ -188,6 +188,7 @@ const Login = () => {
               {isLogin ? "Don't have an account? " : "Already have an account? "}
               <button
                 onClick={() => setIsLogin(!isLogin)}
+                aria-label={isLogin ? "Switch to sign up" : "Switch to log in"}
                 className="font-semibold text-pink-600 hover:text-pink-500 transition-colors"
               >
                 {isLogin ? "Create one now" : "Sign in instead"}

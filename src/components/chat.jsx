@@ -192,7 +192,7 @@ const Chat = () => {
                 {/* Chat Header */}
                 <div className="p-4 md:p-6 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-white/50 dark:bg-zinc-900/50">
                     <div className="flex items-center gap-4">
-                        <Link to="/connections" className="p-2 -ml-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors text-zinc-500">
+                        <Link to="/connections" aria-label="Back to connections" className="p-2 -ml-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors text-zinc-500">
                             <ArrowLeft size={20} />
                         </Link>
                         <div className="relative">
@@ -213,10 +213,10 @@ const Chat = () => {
                         </div>
                     </div>
                     <div className="flex items-center gap-2 md:gap-4 text-zinc-500 dark:text-zinc-400">
-                        <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors cursor-not-allowed opacity-50"><Phone size={20} /></button>
-                        <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors cursor-not-allowed opacity-50 hidden md:block"><Video size={20} /></button>
-                        <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"><Info size={20} /></button>
-                        <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors md:hidden"><MoreVertical size={20} /></button>
+                        <button aria-label="Audio call" className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors cursor-not-allowed opacity-50"><Phone size={20} /></button>
+                        <button aria-label="Video call" className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors cursor-not-allowed opacity-50 hidden md:block"><Video size={20} /></button>
+                        <button aria-label="User info" className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"><Info size={20} /></button>
+                        <button aria-label="More options" className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors md:hidden"><MoreVertical size={20} /></button>
                     </div>
                 </div>
 
@@ -311,6 +311,7 @@ const Chat = () => {
                     <button
                         onClick={sendMessage}
                         disabled={!newMessage.trim()}
+                        aria-label="Send message"
                         className="p-3.5 md:p-4 rounded-full bg-gradient-to-r from-pink-500 to-amber-500 text-white shadow-lg shadow-pink-500/25 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100 disabled:shadow-none transition-all"
                     >
                         <Send size={18} className="ml-0.5" />

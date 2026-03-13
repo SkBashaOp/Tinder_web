@@ -27,9 +27,9 @@ const Footer = () => {
 
         <div className="flex flex-col items-center md:items-end space-y-6">
           <div className="flex space-x-6 text-muted-foreground">
-            <a href="#" className="hover:text-pink-500 transition-colors"><Twitter size={20} /></a>
-            <a href="#" className="hover:text-pink-500 transition-colors"><Github size={20} /></a>
-            <a href="#" className="hover:text-pink-500 transition-colors"><Linkedin size={20} /></a>
+            <a href="#" aria-label="Twitter Profile" className="hover:text-pink-500 transition-colors"><Twitter size={20} /></a>
+            <a href="#" aria-label="GitHub Profile" className="hover:text-pink-500 transition-colors"><Github size={20} /></a>
+            <a href="#" aria-label="LinkedIn Profile" className="hover:text-pink-500 transition-colors"><Linkedin size={20} /></a>
           </div>
           <div className="flex text-sm text-muted-foreground gap-1 items-center">
             <span>Made with</span>
