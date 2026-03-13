@@ -2,6 +2,7 @@ import axiosInstance from "../utils/axiosInstance";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addFeed } from "../store/feedSlice";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Flame } from "lucide-react";
 import UserCard from "./UserCard";
@@ -22,6 +23,7 @@ const Feed = () => {
   const dispatch = useDispatch();
   const [page, setPage] = React.useState(1);
   const [hasMore, setHasMore] = React.useState(true);
+  const location = useLocation();
 
   const getFeed = async (pageNumber) => {
     if (!hasMore) return;
@@ -39,13 +41,30 @@ const Feed = () => {
     }
   };
 
+  // Re-fetch feed on every navigation to this page
   useEffect(() => {
-    // Initial fetch if feed is null
-    if (!feed) {
-      getFeed(1);
+    setPage(1);
+    setHasMore(true);
+    dispatch(addFeed(null));
+    getFeedFresh(1);
+  }, [location.key]);
+
+  const getFeedFresh = async (pageNumber) => {
+    try {
+      const res = await axiosInstance.get(`/user/feed?page=${pageNumber}&limit=10`);
+      const newUsers = res?.data?.data || [];
+      if (newUsers.length === 0) {
+        setHasMore(false);
+      }
+      dispatch(addFeed(newUsers));
+    } catch (error) {
+      console.error("Failed to load feed", error);
     }
+  };
+
+  useEffect(() => {
     // Refetch next page when feed runs out (all cards swiped)
-    else if (feed.length === 0 && hasMore) {
+    if (feed && feed.length === 0 && hasMore) {
       const nextPage = page + 1;
       setPage(nextPage);
       getFeed(nextPage);

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { createSocketConnection } from "../utils/socket";
 import { useSelector } from "react-redux";
 import axiosInstance from "../utils/axiosInstance";
@@ -21,6 +21,7 @@ const Chat = () => {
     const scrollRef = useRef(null);
     const socketRef = useRef(null);
     const typingTimeoutRef = useRef(null);
+    const location = useLocation();
 
     // ── Load historical messages from DB ────────────────────────────────────
     useEffect(() => {
@@ -55,7 +56,7 @@ const Chat = () => {
                 }
             })
             .catch(() => {/* non-critical */ });
-    }, [targetUserId]);
+    }, [targetUserId, location.key]);
 
     // ── Socket connection ────────────────────────────────────────────────────
     useEffect(() => {

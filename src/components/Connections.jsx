@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Users, Code2, MapPin, X } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 // Container animation variants
 const containerVariants = {
@@ -28,6 +28,7 @@ const Connections = () => {
   const dispatch = useDispatch();
   const connections = useSelector((store) => store.connection);
   const [removing, setRemoving] = useState({});
+  const location = useLocation();
 
   const fetchConnections = async () => {
     try {
@@ -52,7 +53,7 @@ const Connections = () => {
 
   useEffect(() => {
     fetchConnections();
-  }, []);
+  }, [location.key]);
 
   if (!connections) {
     return (
