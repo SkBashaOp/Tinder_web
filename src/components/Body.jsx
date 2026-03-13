@@ -54,18 +54,20 @@ const Body = () => {
     fetchUser();
   }, [location.pathname]);
 
+  // Set up the foreground push notification listener ONCE on mount
+  // This must stay stable across all page navigations
   useEffect(() => {
-    // Start listening globally for push notifications when the app is active
     const unsubscribe = onForegroundMessage();
-
-    // Ensure the Firebase messaging token is active in this session
-    if (userData) {
-      requestFirebaseNotificationPermission();
-    }
-
     return () => {
       if (unsubscribe) unsubscribe();
     };
+  }, []);
+
+  // Register the FCM token when the user is authenticated
+  useEffect(() => {
+    if (userData) {
+      requestFirebaseNotificationPermission();
+    }
   }, [userData]);
 
   return (
