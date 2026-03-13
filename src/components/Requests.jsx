@@ -2,6 +2,7 @@ import axiosInstance from "../utils/axiosInstance";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addRequest, removRequestOnAccept } from "../store/requestSlice";
+import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Check, X, Code2 } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
@@ -23,6 +24,7 @@ const itemVariants = {
 const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((store) => store.request);
+  const location = useLocation();
 
   const fetchRequests = async () => {
     try {
@@ -45,7 +47,7 @@ const Requests = () => {
 
   useEffect(() => {
     fetchRequests();
-  }, []);
+  }, [location.key]);
 
   if (!requests) {
     return (
