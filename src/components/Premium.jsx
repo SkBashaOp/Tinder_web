@@ -1,5 +1,7 @@
 import axiosInstance from "../utils/axiosInstance";
+import clerkAxios from "../utils/clerkAxios";
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Check, Star, Crown, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -22,6 +24,8 @@ const Premium = () => {
     const [isUserPremium, setIsUserPremium] = useState(false);
     const [membershipType, setMembershipType] = useState(null);
     const [loading, setLoading] = useState(false);
+    const userData = useSelector((store) => store.user);
+    const isClerk = userData?.loginUser?.clerkId;
 
     // Boost specific state
     const [boostActive, setBoostActive] = useState(false);
@@ -34,7 +38,9 @@ const Premium = () => {
 
     const checkPremiumStatus = async () => {
         try {
-            const res = await axiosInstance.get("/premium/verify");
+            const client = isClerk ? clerkAxios : axiosInstance;
+            const endpoint = isClerk ? "/clerk/premium/verify" : "/premium/verify";
+            const res = await client.get(endpoint);
             if (res.data.isPremium && res.data.membershipType && res.data.membershipType !== "boost") {
                 setIsUserPremium(true);
                 setMembershipType(res.data.membershipType);
@@ -82,8 +88,11 @@ const Premium = () => {
 
     const verifyPremiumPayment = async (response) => {
         try {
-            const res = await axiosInstance.post(
-                "/payment/verify",
+            const client = isClerk ? clerkAxios : axiosInstance;
+            const endpoint = isClerk ? "/clerk/payment/verify" : "/payment/verify";
+
+            const res = await client.post(
+                endpoint,
                 {
                     razorpay_payment_id: response.razorpay_payment_id,
                     razorpay_order_id: response.razorpay_order_id,
@@ -131,8 +140,11 @@ const Premium = () => {
         }
 
         try {
-            const order = await axiosInstance.post(
-                "/payment/create",
+            const client = isClerk ? clerkAxios : axiosInstance;
+            const endpoint = isClerk ? "/clerk/payment/create" : "/payment/create";
+
+            const order = await client.post(
+                endpoint,
                 {
                     membershipType: type,
                 },

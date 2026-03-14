@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Check, X, Code2 } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
+import { useAuth } from "@clerk/clerk-react";
+import clerkAxios from "../utils/clerkAxios";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -24,11 +26,19 @@ const itemVariants = {
 const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((store) => store.request);
+  const userData = useSelector((store) => store.user);
   const location = useLocation();
+  const { isSignedIn } = useAuth();
 
   const fetchRequests = async () => {
     try {
-      const res = await axiosInstance.get("/user/request/received");
+      let res;
+      const isClerk = userData?.loginUser?.clerkId;
+      if (isClerk) {
+        res = await clerkAxios.get("/clerk/request/received");
+      } else {
+        res = await axiosInstance.get("/user/request/received");
+      }
       dispatch(addRequest(res?.data?.allReceivedRequest));
     } catch (error) {
       console.error("Failed to fetch requests", error);
@@ -37,7 +47,11 @@ const Requests = () => {
 
   const handleAction = async (status, id) => {
     try {
-      await axiosInstance.post(`/request/review/${status}/${id}`, {});
+      const isClerk = userData?.loginUser?.clerkId;
+      const client = isClerk ? clerkAxios : axiosInstance;
+      const endpoint = isClerk ? `/clerk/request/review/${status}/${id}` : `/request/review/${status}/${id}`;
+      
+      await client.post(endpoint, {});
       // Remove from UI
       dispatch(removRequestOnAccept(id));
     } catch (error) {

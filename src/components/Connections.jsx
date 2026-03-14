@@ -7,6 +7,8 @@ import { Users, Code2, MapPin, X } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
+import clerkAxios from "../utils/clerkAxios";
 
 // Container animation variants
 const containerVariants = {
@@ -27,12 +29,20 @@ const itemVariants = {
 const Connections = () => {
   const dispatch = useDispatch();
   const connections = useSelector((store) => store.connection);
+  const userData = useSelector((store) => store.user);
   const [removing, setRemoving] = useState({});
   const location = useLocation();
+  const { isSignedIn } = useAuth();
 
   const fetchConnections = async () => {
     try {
-      const res = await axiosInstance.get("/user/request/accepted");
+      let res;
+      const isClerk = userData?.loginUser?.clerkId;
+      if (isClerk) {
+        res = await clerkAxios.get("/clerk/request/accepted");
+      } else {
+        res = await axiosInstance.get("/user/request/accepted");
+      }
       dispatch(addConnection(res?.data?.data));
     } catch (error) {
       console.error("Failed to fetch connections", error);
@@ -42,7 +52,12 @@ const Connections = () => {
   const handleRemove = async (userId) => {
     setRemoving((prev) => ({ ...prev, [userId]: true }));
     try {
-      await axiosInstance.delete(`/request/remove/${userId}`);
+      const isClerk = userData?.loginUser?.clerkId;
+      if (isClerk) {
+        await clerkAxios.delete(`/clerk/request/remove/${userId}`);
+      } else {
+        await axiosInstance.delete(`/request/remove/${userId}`);
+      }
       dispatch(removeConnection(userId));
     } catch (error) {
       console.error("Failed to remove connection", error);

@@ -11,10 +11,8 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      window.location.href = "/login";
-    }
-
+    // Rely on React Router (Body.jsx) to handle 401 redirects.
+    // window.location.href forces hard reloads and breaks parallel auth flows.
     return Promise.reject(error);
   }
 );

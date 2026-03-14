@@ -6,6 +6,8 @@ import axiosInstance from "../utils/axiosInstance";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, ArrowLeft, Phone, Video, Info, MoreVertical } from "lucide-react";
 import { requestFirebaseNotificationPermission } from "../utils/firebaseClient";
+import { useAuth } from "@clerk/clerk-react";
+import clerkAxios from "../utils/clerkAxios";
 
 const Chat = () => {
     const { targetUserId } = useParams();
@@ -22,14 +24,21 @@ const Chat = () => {
     const socketRef = useRef(null);
     const typingTimeoutRef = useRef(null);
     const location = useLocation();
+    const { isSignedIn } = useAuth();
 
     // ── Load historical messages from DB ────────────────────────────────────
     useEffect(() => {
         if (!targetUserId) return;
 
-        axiosInstance
-            .get("/chat/" + targetUserId)
-            .then((res) => {
+        const fetchChat = async () => {
+            try {
+                let res;
+                const isClerk = loginUser?.clerkId;
+                if (isClerk) {
+                    res = await clerkAxios.get("/clerk/chat/" + targetUserId);
+                } else {
+                    res = await axiosInstance.get("/chat/" + targetUserId);
+                }
                 const msgs = (res?.data?.messages || []).map((msg) => {
                     const { senderId, text, seen } = msg;
                     return {
@@ -42,28 +51,41 @@ const Chat = () => {
                     };
                 });
                 setMessages(msgs);
-            })
-            .catch((err) => console.error("fetchChat error:", err));
+            } catch (err) {
+                console.error("fetchChat error:", err);
+            }
+        };
 
-        axiosInstance
-            .get("/user/" + targetUserId)
-            .then((res) => {
+        const fetchUser = async () => {
+            try {
+                let res;
+                const isClerk = loginUser?.clerkId;
+                if (isClerk) {
+                    res = await clerkAxios.get("/clerk/user/" + targetUserId);
+                } else {
+                    res = await axiosInstance.get("/user/" + targetUserId);
+                }
                 if (res.data?.firstName) {
                     setTargetName(res.data.firstName + " " + (res.data.lastName || ""));
                     if (res.data.photoUrl) {
                         setTargetPhoto(res.data.photoUrl);
                     }
                 }
-            })
-            .catch(() => {/* non-critical */ });
-    }, [targetUserId, location.key]);
+            } catch (err) {
+                // non-critical
+            }
+        };
+
+        fetchChat();
+        fetchUser();
+    }, [targetUserId, location.key, isSignedIn]);
 
     // ── Socket connection ────────────────────────────────────────────────────
     useEffect(() => {
         if (!userId || !targetUserId) return;
 
         // Ensure user device is mapped to DB for offline Push Notifications
-        requestFirebaseNotificationPermission();
+        requestFirebaseNotificationPermission(!!loginUser?.clerkId);
 
         const socket = createSocketConnection();
         socketRef.current = socket;

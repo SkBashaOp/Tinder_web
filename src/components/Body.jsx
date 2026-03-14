@@ -8,15 +8,27 @@ import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../utils/axiosInstance";
 import { addUser } from "../store/userSlice";
 import { onForegroundMessage, requestFirebaseNotificationPermission } from "../utils/firebaseClient";
+import { useAuth } from "@clerk/clerk-react";
+import clerkAxios from "../utils/clerkAxios";
 
 const Body = () => {
   const navigate = useNavigate();
   const userData = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const location = useLocation();
+  const { isLoaded, isSignedIn } = useAuth();
 
   const fetchUser = async () => {
-    const publicRoutes = ["/", "/login", "/privacy-policy", "/terms", "/refund-policy"];
+    const publicRoutes = [
+      "/", 
+      "/login", 
+      "/privacy-policy", 
+      "/terms", 
+      "/refund-policy",
+      "/clerk-login",
+      "/clerk-signup",
+      "/clerk-callback"
+    ];
 
     // If we have user data, we are authenticated.
     if (userData) {
@@ -31,28 +43,45 @@ const Body = () => {
       return;
     }
 
-    try {
-      const res = await axiosInstance.get("/profile/view");
+    let success = false;
 
-      dispatch(addUser(res.data));
-
-      if (location.pathname === "/" || location.pathname === "/login") {
-        navigate("/feed");
+    // 1. Try Clerk Auth if signed in with Clerk
+    if (isSignedIn) {
+      try {
+        const res = await clerkAxios.get("/clerk/profile");
+        dispatch(addUser(res.data));
+        success = true;
+      } catch (error) {
+        console.warn("Clerk profile fetch failed, falling back to standard auth...", error.message);
       }
-    } catch (error) {
-      if (error?.response?.status === 401) {
+    }
+
+    // 2. Try Standard Auth if Clerk failed or wasn't attempted
+    if (!success) {
+      try {
+        const res = await axiosInstance.get("/profile/view");
+        dispatch(addUser(res.data));
+        success = true;
+      } catch (error) {
+        // Both failed. If not a public route, redirect.
         if (!publicRoutes.includes(location.pathname)) {
           navigate("/login");
         }
-      } else {
-        console.error("Failed to fetch user", error);
       }
+    }
+
+    // 3. Handle successful login redirects
+    if (success && (location.pathname === "/" || location.pathname === "/login" || location.pathname === "/clerk-login" || location.pathname === "/clerk-signup")) {
+      navigate("/feed");
     }
   };
 
   useEffect(() => {
-    fetchUser();
-  }, [location.pathname]);
+    // Only fetch user profile if Clerk has finished loading its state
+    if (isLoaded) {
+      fetchUser();
+    }
+  }, [location.pathname, isLoaded, isSignedIn]);
 
   // Set up the foreground push notification listener ONCE on mount
   // This must stay stable across all page navigations
@@ -63,10 +92,10 @@ const Body = () => {
     };
   }, []);
 
-  // Register the FCM token when the user is authenticated
   useEffect(() => {
     if (userData) {
-      requestFirebaseNotificationPermission();
+      const isClerk = !!userData?.loginUser?.clerkId;
+      requestFirebaseNotificationPermission(isClerk);
     }
   }, [userData]);
 

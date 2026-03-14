@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../store/userSlice";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
+import clerkAxios from "../utils/clerkAxios";
 import { Save, UserCircle2 } from "lucide-react";
 import UserCard from "./UserCard";
 
@@ -25,6 +26,7 @@ const EditProfile = ({ user }) => {
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
+  const userData = useSelector((store) => store.user);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -101,7 +103,11 @@ const EditProfile = ({ user }) => {
         about: about.trim(),
       };
 
-      const res = await axiosInstance.patch("/profile/edit", payload);
+      const isClerk = userData?.loginUser?.clerkId;
+      const client = isClerk ? clerkAxios : axiosInstance;
+      const endpoint = isClerk ? "/clerk/profile" : "/profile/edit";
+
+      const res = await client.patch(endpoint, payload);
 
       // Wrap in the same shape that Body.jsx uses so the Navbar keeps working:
       // Redux user state is always { message, loginUser: {...} }

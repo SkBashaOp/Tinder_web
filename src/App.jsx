@@ -14,10 +14,31 @@ import PrivacyPolicy from "./components/PrivacyPolicy";
 import TermsAndConditions from "./components/TermsAndConditions";
 import RefundPolicy from "./components/RefundPolicy";
 import Chat from "./components/chat";
+import ClerkSignIn from "./components/ClerkSignIn";
+import ClerkSignUp from "./components/ClerkSignUp";
+import ClerkCallback from "./components/ClerkCallback";
+import ClerkLayout from "./components/ClerkLayout";
+import { useAuth } from "@clerk/clerk-react";
+import { setClerkTokenGetter } from "./utils/clerkAxios";
+import { useEffect } from "react";
+
+const ClerkTokenInit = () => {
+  const { getToken } = useAuth();
+  
+  // Set synchronously during render so it's immediately available to child components
+  setClerkTokenGetter(getToken);
+  
+  useEffect(() => {
+    setClerkTokenGetter(getToken);
+  }, [getToken]);
+  
+  return null;
+};
 
 const App = () => {
   return (
     <>
+      <ClerkTokenInit />
       <BrowserRouter basename="/">
         <Suspense fallback={<div>Loading...</div>}>
           <Routes>
@@ -34,6 +55,14 @@ const App = () => {
               <Route path="/refund-policy" element={<RefundPolicy />}></Route>
               <Route path="/chat/:targetUserId" element={<Chat />} />
             </Route>
+            
+            {/* Clerk auth routes — separate from Body.jsx to prevent cookie auth loops */}
+            <Route element={<ClerkLayout />}>
+              <Route path="/clerk-login" element={<ClerkSignIn />} />
+              <Route path="/clerk-signup" element={<ClerkSignUp />} />
+              <Route path="/clerk-callback" element={<ClerkCallback />} />
+            </Route>
+            
             <Route path="*" element={<ErrorPage />} />
           </Routes>
         </Suspense>

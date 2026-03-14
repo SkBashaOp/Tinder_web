@@ -1,10 +1,12 @@
 import axiosInstance from "../utils/axiosInstance";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { removeUserFromFeed } from "../store/feedSlice";
 import { toast } from "react-toastify";
 import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
 import { X, Heart, Code2, Info, MapPin, Flame } from "lucide-react";
+import { useAuth } from "@clerk/clerk-react";
+import clerkAxios from "../utils/clerkAxios";
 
 const DraggableCard = ({ profile, handlePendingRequest }) => {
   const [exitX, setExitX] = useState(0);
@@ -145,6 +147,8 @@ const DraggableCard = ({ profile, handlePendingRequest }) => {
 
 const UserCard = ({ feed }) => {
   const dispatch = useDispatch();
+  const userData = useSelector((store) => store.user);
+  const { isSignedIn } = useAuth();
 
   const handlePendingRequest = async (status, id) => {
     const safeId = String(id).trim();
@@ -155,7 +159,11 @@ const UserCard = ({ feed }) => {
     }, 300);
 
     try {
-      await axiosInstance.post(`/request/send/${status}/${safeId}`, {});
+      const isClerk = userData?.loginUser?.clerkId;
+      const client = isClerk ? clerkAxios : axiosInstance;
+      const endpoint = isClerk ? `/clerk/request/send/${status}/${safeId}` : `/request/send/${status}/${safeId}`;
+      
+      await client.post(endpoint);
     } catch (error) {
       const statusCode = error?.response?.status;
       const responseData = error?.response?.data;

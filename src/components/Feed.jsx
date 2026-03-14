@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { addFeed } from "../store/feedSlice";
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuth } from "@clerk/clerk-react";
+import clerkAxios from "../utils/clerkAxios";
 import { Flame } from "lucide-react";
 import UserCard from "./UserCard";
 
@@ -20,23 +22,30 @@ const CardSkeleton = () => (
 
 const Feed = () => {
   const feed = useSelector((store) => store.feed);
+  const userData = useSelector((store) => store.user);
   const dispatch = useDispatch();
-  const [page, setPage] = React.useState(1);
   const [hasMore, setHasMore] = React.useState(true);
   const [isFetching, setIsFetching] = React.useState(false);
   const location = useLocation();
+  const { isSignedIn } = useAuth();
 
-  const getFeed = async (pageNumber) => {
-    if (!hasMore || isFetching) return;
+  const fetchFeed = async (isFresh = false) => {
+    if ((!hasMore && !isFresh) || isFetching) return;
     setIsFetching(true);
     try {
-      const res = await axiosInstance.get(`/user/feed?page=${pageNumber}&limit=10`);
-
+      const isClerk = userData?.loginUser?.clerkId;
+      const client = isClerk ? clerkAxios : axiosInstance;
+      const endpoint = isClerk ? "/clerk/feed?page=1&limit=10" : "/user/feed?page=1&limit=10";
+      
+      const res = await client.get(endpoint);
       const newUsers = res?.data?.data || [];
+      
       if (newUsers.length === 0) {
         setHasMore(false);
+      } else {
+        setHasMore(true);
       }
-
+      
       dispatch(addFeed(newUsers));
     } catch (error) {
       console.error("Failed to load feed", error);
@@ -47,37 +56,15 @@ const Feed = () => {
 
   // Re-fetch feed on every navigation to this page
   useEffect(() => {
-    setPage(1);
-    setHasMore(true);
-    // Do not set feed to null immediately, instead use isFetching flag
-    // so we don't flash the empty message
-    getFeedFresh(1);
+    fetchFeed(true);
   }, [location.key]);
 
-  const getFeedFresh = async (pageNumber) => {
-    setIsFetching(true);
-    try {
-      const res = await axiosInstance.get(`/user/feed?page=${pageNumber}&limit=10`);
-      const newUsers = res?.data?.data || [];
-      if (newUsers.length === 0) {
-        setHasMore(false);
-      }
-      dispatch(addFeed(newUsers));
-    } catch (error) {
-      console.error("Failed to load feed", error);
-    } finally {
-      setIsFetching(false);
-    }
-  };
-
   useEffect(() => {
-    // Refetch next page when feed runs out (all cards swiped)
+    // Refetch when feed runs out (all cards swiped)
     if (feed && feed.length === 0 && hasMore && !isFetching) {
-      const nextPage = page + 1;
-      setPage(nextPage);
-      getFeed(nextPage);
+      fetchFeed();
     }
-  }, [feed, hasMore, isFetching, page]);
+  }, [feed, hasMore, isFetching]);
 
   return (
     <div className="min-h-screen pt-32 pb-24 px-4 bg-[#fafafa] dark:bg-zinc-950 flex flex-col items-center overflow-hidden">

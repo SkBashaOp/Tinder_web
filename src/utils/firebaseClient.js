@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import axiosInstance from "./axiosInstance";
+import clerkAxios from "./clerkAxios";
 import { toast } from "react-toastify";
 
 // Use Vite environment variables to initialize securely
@@ -16,7 +17,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const messaging = getMessaging(app);
 
-export const requestFirebaseNotificationPermission = async () => {
+export const requestFirebaseNotificationPermission = async (isClerk = false) => {
     try {
         const permission = await Notification.requestPermission();
         if (permission === "granted") {
@@ -27,10 +28,12 @@ export const requestFirebaseNotificationPermission = async () => {
             });
 
             if (token) {
-                // console.log("FCM Token generated!", token);
-
                 // Transmit securely to the Node.js backend
-                await axiosInstance.post("/save-fcm-token", { token });
+                if (isClerk) {
+                    await clerkAxios.post("/clerk/save-fcm-token", { token });
+                } else {
+                    await axiosInstance.post("/save-fcm-token", { token });
+                }
                 return token;
             } else {
                 console.warn("No registration token available. Request permission to generate one.");
