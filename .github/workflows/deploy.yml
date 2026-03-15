@@ -21,9 +21,11 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/Tinder_web
-            git pull origin main
+            git reset --hard
+            git pull
             npm install
             npm run build
             sudo rm -rf /var/www/devfind/*
             sudo cp -r dist/* /var/www/devfind
             sudo systemctl restart nginx
+            
