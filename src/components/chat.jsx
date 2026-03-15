@@ -213,11 +213,11 @@ const Chat = () => {
             >
                 {/* Chat Header */}
                 <div className="p-4 md:p-6 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-white/50 dark:bg-zinc-900/50">
-                    <div className="flex items-center gap-4">
-                        <Link to="/connections" aria-label="Back to connections" className="p-2 -ml-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors text-zinc-500">
+                    <div className="flex items-center gap-4 min-w-0">
+                        <Link to="/connections" aria-label="Back to connections" className="p-2 -ml-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors text-zinc-500 flex-shrink-0">
                             <ArrowLeft size={20} />
                         </Link>
-                        <div className="relative">
+                        <div className="relative flex-shrink-0">
                             <img
                                 src={targetPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${targetUserId}`}
                                 alt="User Avatar"
@@ -225,12 +225,12 @@ const Chat = () => {
                             />
                             <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 border-2 border-white dark:border-zinc-900 rounded-full ${onlineUsers.includes(targetUserId) ? "bg-green-500" : "bg-red-500"}`}></div>
                         </div>
-                        <div>
-                            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{targetName}</h2>
+                        <div className="min-w-0">
+                            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 truncate">{targetName}</h2>
                             {onlineUsers.includes(targetUserId) ? (
-                                <p className="text-xs text-green-500 font-medium">Online</p>
+                                <p className="text-xs text-green-500 font-medium truncate">Online</p>
                             ) : (
-                                <p className="text-xs text-zinc-400 font-medium">Offline</p>
+                                <p className="text-xs text-zinc-400 font-medium truncate">Offline</p>
                             )}
                         </div>
                     </div>
