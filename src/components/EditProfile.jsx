@@ -8,8 +8,9 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import clerkAxios from "../utils/clerkAxios";
-import { Save, UserCircle2 } from "lucide-react";
+import { Save, UserCircle2, Code2 } from "lucide-react";
 import UserCard from "./UserCard";
+import SkillsInput from "./SkillsInput";
 
 const EditProfile = ({ user }) => {
   const [firstName, setFirstName] = useState(user?.firstName || "");
@@ -17,9 +18,7 @@ const EditProfile = ({ user }) => {
   const [photoUrl, setPhotoUrl] = useState(user?.photoUrl || "");
   const [age, setAge] = useState(user?.age || "");
   const [gender, setGender] = useState(user?.gender || "");
-  const [skills, setSkills] = useState(
-    user?.skills ? user.skills.join(", ") : ""
-  );
+  const [skills, setSkills] = useState(user?.skills || []);
   const [about, setAbout] = useState(user?.about || "");
   const [photoFile, setPhotoFile] = useState(null); // The actual File object
   const [photoPreview, setPhotoPreview] = useState(null); // Local preview URL
@@ -69,10 +68,7 @@ const EditProfile = ({ user }) => {
     e.preventDefault();
     setLoading(true);
 
-    const newUserSkills = skills
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const newUserSkills = Array.isArray(skills) ? skills : skills.split(",").map(s => s.trim()).filter(Boolean);
 
     try {
       let finalPhotoUrl = photoUrl;
@@ -232,7 +228,7 @@ const EditProfile = ({ user }) => {
                     min="18"
                     max="100"
                     value={age}
-                    onChange={(e) => setAge(Math.max(18, Number(e.target.value)))}
+                    onChange={(e) => setAge(e.target.value)}
                     placeholder="25"
                   />
                 </div>
@@ -253,12 +249,13 @@ const EditProfile = ({ user }) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="skills">Tech Stack (comma separated)</Label>
-                <Input
-                  id="skills"
-                  value={skills}
-                  onChange={(e) => setSkills(e.target.value)}
-                  placeholder="React, Node.js, Python..."
+                <Label className="flex items-center gap-2">
+                  <Code2 size={16} className="text-pink-500" />
+                  Tech Stack
+                </Label>
+                <SkillsInput 
+                  value={skills} 
+                  onChange={setSkills} 
                 />
               </div>
 
